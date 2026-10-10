@@ -1,0 +1,21 @@
+# Test Cases: Provider Profiles
+
+Profile creation and editing, photo upload, certifications and the public profile. Columns are explained in the [test case template](../templates/test-case-template.md). File size and text limits are example values.
+
+| ID | Title | Preconditions | Test Data | Steps | Expected Result | Priority | Type | Platform |
+|---|---|---|---|---|---|---|---|---|
+| TC-PROF-001 | Create a profile with all required fields | New provider account, no profile | Bio (150 words), 1 service, rate $25/hr, availability set | Complete onboarding, submit | Profile is created, marked "Live" and visible in search | P0 | Positive | Web/Mobile |
+| TC-PROF-002 | Profile can't go live with required fields missing | New provider account | Bio left blank | Try to publish without a bio | Inline error; profile stays "Draft" and is not visible in search | P0 | Negative | Web/Mobile |
+| TC-PROF-003 | Upload a valid profile photo | Existing profile | JPEG, 2 MB, 1080×1080 | Upload the photo in the profile editor | Photo uploads and shows correctly on the profile and search cards | P1 | Positive | Web/Mobile |
+| TC-PROF-004 | Reject an oversized photo | Existing profile | 25 MB PNG (example limit: 10 MB) | Try to upload | Inline error with the size limit; nothing saved | P2 | Negative | Web/Mobile |
+| TC-PROF-005 | Reject a non-image file with an image extension | Existing profile | `malware.exe` renamed to `photo.jpg` | Try to upload | Upload rejected after checking the real file type, not only the extension | P1 | Negative/Security | Web |
+| TC-PROF-006 | Edit and save the bio | Existing profile | New bio, 500 characters | Edit the bio, save | Change is still there after refresh/restart and shows on the public profile | P1 | Positive | Web/Mobile |
+| TC-PROF-007 | Bio respects the character limit | Existing profile | 5,000 characters (example limit: 1,000) | Enter text over the limit | Input stops at the limit with a visible counter; no silent data loss on save | P2 | Boundary | Web/Mobile |
+| TC-PROF-008 | Add several services with their own rates | Existing profile | Home Cleaning $30/hr, Tutoring $18/hr | Add two services with different rates | Both are saved and shown separately on the profile and in search filters | P1 | Positive | Web/Mobile |
+| TC-PROF-009 | Remove a service | Profile with 2+ services | Remove "Tutoring" | Delete one service | The service is removed; the provider no longer appears in "Tutoring" search results | P1 | Positive | Web/Mobile |
+| TC-PROF-010 | Certification upload and "Verified" badge | Existing profile, admin verification step exists | Certification PDF | Upload the document | Shows "Pending verification" until approved; the badge appears only after approval | P1 | Positive | Web |
+| TC-PROF-011 | Public profile hides private contact details | Public profile | Provider's phone/email in settings | View the profile logged out and as another provider | Phone and personal email are NOT shown; only in-app messaging and booking | P0 | Security/Negative | Web/Mobile |
+| TC-PROF-012 | Calendar shows booked slots right away | Provider has an upcoming confirmed booking | Booked slot: Sat 2–4 PM | Open the provider's public calendar | The booked slot shows as unavailable to other customers right after confirmation | P0 | Positive | Web/Mobile |
+| TC-PROF-013 | Provider can pause the profile | Live profile | — | Turn on "Pause my profile" | Profile stops appearing in search right away (see [TC-SRCH-017](02-search-filtering-test-cases.md)); confirmed bookings are not affected | P1 | Positive | Web/Mobile |
+| TC-PROF-014 | Rate change during a customer's checkout | Customer is in checkout with this provider | Provider changes the rate | Change the hourly rate while a customer is in checkout at the old rate | Checkout either locks the price at the slot hold, or shows the new price before payment. The price shown must never differ from the price charged (see [BUG-005](../bug-reports/BUG-005-price-mismatch-frontend-backend.md)) | P0 | Edge | Web |
+| TC-PROF-015 | Average rating updates after a new review | Profile with reviews | New 5-star review | Customer leaves a review after a completed booking | Average rating is recalculated and updated on the profile and search cards | P2 | Positive | Web/Mobile |

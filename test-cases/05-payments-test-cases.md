@@ -1,0 +1,22 @@
+# Test Cases: Payments
+
+Checkout, payment methods, receipts, refunds and failures. All payment testing uses the payment provider's **sandbox/test mode**, never real cards. Columns are explained in the [test case template](../templates/test-case-template.md). Related bug: [BUG-003](../bug-reports/BUG-003-payment-double-charge-retry.md).
+
+Example values used: service fee $5, late cancellation fee 50%, platform fee 10%.
+
+| ID | Title | Preconditions | Test Data | Steps | Expected Result | Priority | Type | Platform |
+|---|---|---|---|---|---|---|---|---|
+| TC-PAY-001 | Successful payment with a valid test card | Slot chosen, checkout open | Test card `4242 4242 4242 4242`, exp 12/29, CVC 123 | Enter the card, pay | Payment succeeds, booking confirmed, receipt with the correct amount | P0 | Positive | Web/Mobile |
+| TC-PAY-002 | Declined card shows a clear error | Checkout open | Provider's decline test card | Pay with the decline card | Clear error ("Your card was declined. Try another payment method."); booking not confirmed; slot released; customer NOT charged | P0 | Negative | Web/Mobile |
+| TC-PAY-003 | Double click/tap on "Pay" doesn't charge twice | Checkout open | Valid test card | Double-click/double-tap "Pay Now" quickly | Only ONE charge; the button disables after the first click; API and database show one payment record (see [BUG-003](../bug-reports/BUG-003-payment-double-charge-retry.md)) | P0 | Negative/Concurrency | Web/Mobile |
+| TC-PAY-004 | Timeout during payment doesn't double charge on retry | Checkout open, slow/dropped network (DevTools throttling) | Valid test card | Pay, throttle the network until it times out, retry | The idempotency key prevents a second charge for the same booking attempt | P0 | Negative/Edge | Web (API) |
+| TC-PAY-005 | Receipt shows the exact amount charged | Completed booking with a service fee | $30/hr × 2 hr + $5 service fee | Complete the booking, open the receipt | Receipt lists base cost, service fee and total; total matches the card charge | P0 | Positive | Web/Mobile |
+| TC-PAY-006 | Full refund on cancellation inside the free window | Confirmed booking cancelled in the free window | — | Cancel within the policy window | Refund equals the full amount; shown on the receipt/booking history | P0 | Positive | Web/Mobile |
+| TC-PAY-007 | Partial refund for late cancellation | Confirmed booking cancelled inside the late window | Late fee: 50% (example) | Cancel late | Refund = total paid − fee, itemized; not a full refund and not zero | P1 | Negative/Edge | Web/Mobile |
+| TC-PAY-008 | Automatic cancellation triggers an automatic full refund | Booking cancelled automatically (no provider response) | Charged booking | Let the booking cancel per [TC-BOOK-008](04-booking-test-cases.md) | Customer is refunded in full without asking | P1 | Positive | Web (backend) |
+| TC-PAY-009 | Pay with a saved card | Customer has a saved card | Saved test card | Book a new service, choose the saved card | Payment succeeds without entering the card again; only the last 4 digits are shown | P1 | Positive | Web/Mobile |
+| TC-PAY-010 | Removing a saved card doesn't affect past bookings | Saved card, past completed booking | — | Remove the card in account settings | Card removed; past bookings and receipts are still there | P2 | Positive | Web/Mobile |
+| TC-PAY-011 | Amount format is the same everywhere | Completed booking | $27.50 total | Check the price on the search card, profile, checkout and receipt | Same amount and format at every step (never $27.5 vs $27.50 vs $28) | P1 | Positive | Web/Mobile |
+| TC-PAY-012 | Expired card is rejected before submitting | Checkout open | Test card with a past expiry date | Enter the expired card, pay | Inline validation catches it before the payment provider; clear message | P2 | Negative | Web/Mobile |
+| TC-PAY-013 | Payment amount can't be changed on the client | Checkout open | Real price $50, changed request price $1 | Send the checkout request with a lower price (DevTools or Postman) | Server calculates the price itself and ignores or rejects the client value; customer is charged the correct amount | P0 | Security/Negative | Web (API) |
+| TC-PAY-014 | Provider payout record after a paid booking | Booking completed and paid | $30/hr × 2 hr, platform fee 10% (example) | Mark the booking complete | Payout record shows the correct amount after the platform fee; can be checked with [SQL](../database-validation/sql-validation-queries.md) | P1 | Positive | Web (backend/DB) |
