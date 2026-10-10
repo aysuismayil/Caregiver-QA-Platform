@@ -1,9 +1,9 @@
-# Service Marketplace QA (Web + Mobile)
+# Caregiver QA Platform (Web + Mobile)
 
 QA portfolio based on my professional experience testing a two-sided **service-booking marketplace** (web, iOS and Android). In this repository the product is called **the Marketplace App**.
 
 > **About this repository**
-> The QA work, methods and types of issues are real. To protect the client's confidential information, the product name and domain, data, endpoints, database structure, release names and business rules are removed, generalized or reconstructed. Business values in the requirements and test cases (prices, time windows, distances, fees) are example values. Evidence files (screenshots, screen recordings, network captures, Postman results, SQL output) are not included because they may contain confidential information.
+> The QA work, methods and types of issues are real. To protect the client's confidential information, the product name, data, endpoints, database structure, release names and business rules are removed, generalized or reconstructed. Business values in the requirements and test cases (prices, time windows, distances, fees) are example values. Evidence files (screenshots, screen recordings, network captures, Postman results, SQL output) are not included because they may contain confidential information.
 
 ---
 
